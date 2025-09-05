@@ -1,52 +1,27 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AutoLogo Market</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!-- Користувач -->
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Пароль">
+<button id="signup-btn">Реєстрація</button>
+<button id="login-btn">Вхід</button>
+<button id="logout" style="display:none">Вийти</button>
+<span id="user-email">Гість</span>
 
-<header>
-  <h1>AutoLogo Market</h1>
-  <div class="header-right">
-    <span id="user-email">Гість</span>
-    <button id="logout" style="display:none;">Вийти</button>
-    <span>Баланс: $<span id="balance">0</span></span>
-  </div>
-</header>
+<!-- Баланс -->
+<div>Баланс: $<span id="balance">0</span></div>
 
-<main>
-  <!-- Авторизація -->
-  <section id="auth-section">
-    <h2>Авторизація / Реєстрація</h2>
-    <input type="email" id="email" placeholder="Email">
-    <button id="login-btn">Увійти</button>
-  </section>
+<!-- Додавання логотипів -->
+<div id="add-logo-section" style="display:none">
+  <input id="logo-name" placeholder="Назва логотипу">
+  <input id="logo-price" type="number" placeholder="Ціна">
+  <input id="logo-image" placeholder="URL картинки">
+  <button id="add-logo-btn">Додати логотип</button>
+</div>
 
-  <!-- Додавання логотипів -->
-  <section id="add-logo-section" style="display:none;">
-    <h2>Додати логотип</h2>
-    <input type="text" id="logo-name" placeholder="Назва логотипу">
-    <input type="number" id="logo-price" placeholder="Ціна">
-    <input type="url" id="logo-image" placeholder="URL зображення">
-    <button id="add-logo-btn">Додати логотип</button>
-  </section>
+<!-- Логотипи -->
+<div id="logos"></div>
 
-  <!-- Логотипи -->
-  <section id="logos" class="logo-grid"></section>
+<!-- Історія покупок -->
+<div id="purchase-history"></div>
 
-  <!-- Історія покупок -->
-  <section id="purchase-history">
-    <h2>Історія покупок:</h2>
-  </section>
-
-</main>
-
-<!-- Toast -->
-<div id="toast-container"></div>
-
-<script src="script.js"></script>
-</body>
-</html>
+<!-- Toast повідомлення -->
+<div id="toast-container" class="toast-container"></div>
