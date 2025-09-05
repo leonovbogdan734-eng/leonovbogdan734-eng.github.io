@@ -1,0 +1,225 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #1b1b1b;
+  color: #eee;
+}
+
+header {
+  background: #111;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+}
+
+header h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+}
+
+.header-right {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  padding: 25px;
+}
+
+.logo-card {
+  background: linear-gradient(145deg, #222, #2b2b2b);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.logo-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(255,140,0,0.6);
+  background: linear-gradient(145deg, #2b2b2b, #333);
+}
+
+.logo-name {
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #ffb74d;
+}
+
+.logo-price {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 15px;
+}
+
+.buy-button {
+  background: linear-gradient(145deg, #ff4c00, #ff8c00);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.buy-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #ff8c00;
+}
+
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.toast {
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideIn 0.5s forwards, fadeOut 0.5s 2.5s forwards;
+  color: white;
+  font-weight: 500;
+}
+
+.toast-success { background-color: #4caf50; }
+.toast-warning { background-color: #ff9800; }
+.toast-error   { background-color: #f44336; }
+
+@keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
+
+@media (max-width: 600px) {
+  .logo-grid { grid-template-columns: 1fr; padding: 15px; }
+}
+3️⃣ JavaScript (script.js)
+javascript
+Копировать код
+// --- Авторизація ---
+const emailInput = document.getElementById('email');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout');
+const userEmailSpan = document.getElementById('user-email');
+
+let currentUser = localStorage.getItem('currentUser') || null;
+let balance = parseFloat(localStorage.getItem('balance')) || 0;
+
+// Показуємо email і баланс
+function updateUI() {
+  userEmailSpan.innerText = currentUser || "Гість";
+  document.getElementById('balance').innerText = balance;
+  document.getElementById('add-logo-section').style.display = currentUser ? 'block' : 'none';
+  logoutBtn.style.display = currentUser ? 'inline-block' : 'none';
+}
+
+updateUI();
+
+// Логін / реєстрація
+loginBtn.addEventListener('click', () => {
+  const email = emailInput.value.trim();
+  if(!email) return showToast('Введіть email', 'error');
+  currentUser = email;
+  localStorage.setItem('currentUser', currentUser);
+  updateUI();
+  showToast('Вхід успішний', 'success');
+  loadLogos();
+});
+
+logoutBtn.addEventListener('click', () => {
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  updateUI();
+  showToast('Вийшли з системи', 'warning');
+});
+
+// --- Toast ---
+function showToast(message, type='success'){
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerText = message;
+  container.appendChild(toast);
+  setTimeout(()=> container.removeChild(toast),3000);
+}
+
+// --- Логотипи ---
+function getLogos(){
+  return JSON.parse(localStorage.getItem('logos')) || [];
+}
+
+function saveLogos(logos){
+  localStorage.setItem('logos', JSON.stringify(logos));
+}
+
+function loadLogos(){
+  const logosContainer = document.getElementById('logos');
+  logosContainer.innerHTML = '';
+  const logos = getLogos();
+  logos.forEach((logo, index)=>{
+    const card = document.createElement('div');
+    card.className = 'logo-card';
+    card.innerHTML = `
+      <img src="${logo.image}" alt="${logo.name}" style="width:100%;border-radius:10px;margin-bottom:10px;">
+      <span class="logo-name">${logo.name}</span>
+      <span class="logo-price">$${logo.price}</span>
+      <button class="buy-button" data-index="${index}">Купити</button>
+    `;
+    logosContainer.appendChild(card);
+  });
+
+  // Кнопки Купити
+  document.querySelectorAll('.buy-button').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const idx = e.target.dataset.index;
+      const logos = getLogos();
+      const logo = logos[idx];
+      if(!currentUser) return showToast('Увійдіть для покупки', 'error');
+      balance += parseFloat(logo.price);
+      localStorage.setItem('balance', balance);
+      addPurchase(logo);
+      updateUI();
+      showToast(`Купили ${logo.name} за $${logo.price}`, 'success');
+    });
+  });
+}
+
+// --- Додавання логотипів ---
+document.getElementById('add-logo-btn').addEventListener('click', ()=>{
+  const name = document.getElementById('logo-name').value.trim();
+  const price = parseFloat(document.getElementById('logo-price').value);
+  const image = document.getElementById('logo-image').value.trim();
+  if(!name || !price || !image) return showToast('Заповніть всі поля', 'error');
+
+  const logos = getLogos();
+  logos.push({name, price
+
+
+
+
+
+
+Спросить ChatGPT
+
+
